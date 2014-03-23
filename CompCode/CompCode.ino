@@ -1,7 +1,9 @@
 //Servo setup
-#include <Servo.h>
+#include <Servo.h> //servo library
+
 Servo steerServo, rightDrive, leftDrive; 
-#define STOP_DELAY 1000
+
+#define STOP_DELAY 1000 
 #define BACK_DELAY 300
 #define TURN_DELAY 150
 #define GO_DELAY 400
@@ -12,18 +14,18 @@ Servo steerServo, rightDrive, leftDrive;
 #define LEFT 180
 #define RIGHT 10
 #define STRAIGHT 70
-//IR setup
+
 int leftIR, rightIR;                        
 
 void setup()
 {
-  //set wheels to pins and start straight
-  steerServo.attach(9);  
+  steerServo.attach(9);                         //set wheels to pins and start straight
   steerServo.write(STRAIGHT);   
-  rightDrive.attach(5); 
+  
+rightDrive.attach(5); 
   leftDrive.attach(6);
-  //linear throttle curve on startup
-  for(int i = 100; i < GO; i += 10)
+
+  for(int i = 100; i < GO; i += 10)           //linear throttle curve on startup
   {
     rightDrive.write(i);  
     leftDrive.write(i); 
