@@ -19,11 +19,11 @@ int leftIR, rightIR;
 
 void setup()
 {
-  steerServo.attach(9);                         //set wheels to pins and start straight
+  steerServo.attach(6);                         //set wheels to pins and start straight
   steerServo.write(STRAIGHT);   
   
-rightDrive.attach(5); 
-  leftDrive.attach(6);
+rightDrive.attach(10); 
+  leftDrive.attach(9);
 
   for(int i = 100; i < GO; i += 10)           //linear throttle curve on startup
   {
@@ -38,7 +38,7 @@ void loop()
 {  
   //check IR sensors
   leftIR = analogRead(A1);  
-  rightIR = analogRead(A2); 
+  rightIR = analogRead(A0); 
   //left turn
   while(leftIR > WHITE_THRESH)
   {
@@ -54,13 +54,13 @@ void loop()
     rightDrive.write(GO);
     delay(GO_DELAY);
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
   //right turn
   while(rightIR > WHITE_THRESH)
   {
     Serial.println("Go Right");
-    steerServo.write(LEFT);
+    steerServo.write(LEFT;
     delay(TURN_DELAY);
     leftDrive.write(BACK); 
     rightDrive.write(BACK);
@@ -71,7 +71,7 @@ void loop()
     rightDrive.write(GO);
     delay(GO_DELAY);
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
   //straight
   while(leftIR <= WHITE_THRESH && rightIR <= WHITE_THRESH)
@@ -81,7 +81,7 @@ void loop()
     Serial.println("Go Straight");
     steerServo.write(STRAIGHT);
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
 }
 

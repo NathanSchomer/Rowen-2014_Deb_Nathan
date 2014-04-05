@@ -4,6 +4,7 @@
 Servo steerServo, rightDrive, leftDrive;
 #define STOP_DELAY 100
 #define TURN_DELAY 800 
+#define GO_DELAY 400
 #define WHITE_THRESH 992                      
 #define STOP 90
 #define GO 300
@@ -24,7 +25,7 @@ int tot;
 int ii; 
 double avg;
 //LCD setup
-LiquidCrystal lcd(12, 11, 10, 7, 4, 3, 2); 
+LiquidCrystal lcd(12, 11, 8, 5, 4, 3, 2); 
 int backLight = 13; 
 int sensorPin = A0; 
 int ledPin = 13; 
@@ -36,10 +37,10 @@ int t = 0;
 void setup()
 {
   //set and straighten wheels
-  steerServo.attach(9);  
+  steerServo.attach(6);  
   steerServo.write(STRAIGHT);  
-  rightDrive.attach(5); 
-  leftDrive.attach(6); 
+  rightDrive.attach(10); 
+  leftDrive.attach(9); 
   //linear throttle curve on startup  
   for(int i = 100; i < GO; i += 10)  
   {
@@ -65,11 +66,11 @@ int angle_check()
   xx = -1.0909*x+450;
   yy = 1.0286*y-360.51+12;
   zz = 0.9783*z - 239.18-3;
-
   deg = atan2(zz,yy);
   deg = deg*180/PI;
-  deg = (deg-87)*-1;
-  
+  deg = deg - 83;
+  deg = deg*1.75;
+
   t++;
   //if going up incline: sum, count, and display deg
   if (deg > 9 && t>2 && t<5 )
@@ -88,7 +89,8 @@ int angle_check()
       zz = 0.9783*z - 239.18-3;
       deg = atan2(zz,yy);
       deg = deg*180/PI;
-      deg = (deg-87)*-1;
+      deg = deg - 83;
+      deg = deg*1.75;
       tot += deg;
       lcd.setCursor(0,0);
       lcd.print("Inst. Angle: ");
@@ -121,7 +123,8 @@ int angle_check()
       zz = 0.9783*z - 239.18-3;
       deg = atan2(zz,yy);
       deg = deg*180/PI;
-      deg = (deg-87)*-1;
+      deg = deg - 83;
+      deg = deg*1.75;
       lcd.setCursor(0,0);
       lcd.print("Inst. Angle: ");
       lcd.print(deg);
@@ -138,38 +141,43 @@ void loop()
 {  
   //check IR sensors
   leftIR = analogRead(A1);  
-  rightIR = analogRead(A2);
+  rightIR = analogRead(A0); 
   //left turn
   while(leftIR > WHITE_THRESH)
   {
+    //    Serial.println("Go Left");
     steerServo.write(LEFT);
     delay(TURN_DELAY);
     leftDrive.write(GO); 
     rightDrive.write(GO);
+    delay(GO_DELAY);
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
   //right turn
   while(rightIR > WHITE_THRESH)
   {
+    //    Serial.println("Go Right");
     steerServo.write(RIGHT);
     delay(TURN_DELAY);
     leftDrive.write(GO); 
     rightDrive.write(GO);
+    delay(GO_DELAY);
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
   //straight
   while(leftIR <= WHITE_THRESH && rightIR <= WHITE_THRESH)
   {
     leftDrive.write(GO); 
     rightDrive.write(GO);
+    //    Serial.println("Go Straight");
     steerServo.write(STRAIGHT);
-    angle_check();
     leftIR = analogRead(A1);  
-    rightIR = analogRead(A2);
+    rightIR = analogRead(A0);
   }
 }
+
 
 
 

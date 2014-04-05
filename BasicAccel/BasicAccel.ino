@@ -16,8 +16,10 @@ void loop()
   xx = -1.0909*x+450;
   yy = 1.0286*y-360.51+12;
   zz = 0.9783*z - 239.18-3;
-  deg = atan2(yy,zz);
+  deg = atan2(zz,yy);
   deg = deg*180/PI;
+  deg = deg - 83;
+  deg = deg*1.75;
   Serial.println(deg);
 //  Serial.print("X = ");  
 //  Serial.print(xx);
