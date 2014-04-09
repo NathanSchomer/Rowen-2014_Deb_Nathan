@@ -11,8 +11,8 @@ Servo steerServo, rightDrive, leftDrive;
 #define BACK 70
 #define STOP 90
 #define GO 300
-#define LEFT 180
-#define RIGHT 10
+#define LEFT 130
+#define RIGHT 40
 #define STRAIGHT 70
 
 int leftIR, rightIR;                        
@@ -60,7 +60,7 @@ void loop()
   while(rightIR > WHITE_THRESH)
   {
     Serial.println("Go Right");
-    steerServo.write(LEFT;
+    steerServo.write(LEFT);
     delay(TURN_DELAY);
     leftDrive.write(BACK); 
     rightDrive.write(BACK);

@@ -10,7 +10,7 @@ Servo steerServo, rightDrive, leftDrive;
 #define GO 300
 #define LEFT 110
 #define RIGHT 30
-#define STRAIGHT 70
+#define STRAIGHT 50
 //IR setup
 int leftIR, rightIR;                            
 //accelerometer setup
@@ -33,6 +33,13 @@ int sensorValue = 0;
 int prevValue = 0;
 int check = false;
 int t = 0;
+int angleAdder = 0;
+int counter = 1;
+int temp = 1;
+int temp2 = 0;
+float sum = 0;
+float sumcount = 0;
+float avg2;
 
 void setup()
 {
@@ -53,8 +60,24 @@ void setup()
   digitalWrite(backLight, HIGH); 
   lcd.begin(16,2); 
   lcd.clear();
-
+  lcd.setCursor(0,0);           // set cursor to column 0, row 0 (the first row)
+  lcd.print("This is HamBot");
+  delay(2000);
   Serial.begin(9600);
+}
+
+int angle_check2(){
+      x  = analogRead(3);  
+      y  = analogRead(4);    
+      z  = analogRead(5);
+      xx = -1.0909*x+450;
+      yy = 1.0286*y-360.51+12;
+      zz = 0.9783*z - 239.18-3;
+      deg = atan2(zz,yy);
+      deg = deg*180/PI;
+      deg = deg - 83;
+      deg = deg*1.75;
+      return deg;
 }
 
 int angle_check()
@@ -75,8 +98,11 @@ int angle_check()
   //if going up incline: sum, count, and display deg
   if (deg > 9 && t>2 && t<5 )
   {
-    leftDrive.write(STOP); 
-    rightDrive.write(STOP);
+//    leftDrive.write(STOP); 
+//    rightDrive.write(STOP);
+//    delay(150);'    
+   // leftDrive.write(GO); 
+    //rightDrive.write(GO);
     delay(150);
     int currTime = millis();
     while(millis() < (currTime + 250))
@@ -91,26 +117,23 @@ int angle_check()
       deg = deg*180/PI;
       deg = deg - 83;
       deg = deg*1.75;
-      tot += deg;
-      lcd.setCursor(0,0);
-      lcd.print("Inst. Angle: ");
-      lcd.print(deg);
-      lcd.setCursor(0,1);
+      //lcd.setCursor(0,0);
+      //lcd.print("Inst. Angle: ");
+      //lcd.print(deg);
+     // lcd.setCursor(0,1);
       avg = tot / ii;
-      lcd.print("Avg Angle: ");
-      lcd.print(avg);
+      //lcd.print("Avg Angle: ");
+      //lcd.print(avg);
+      return deg;
       ii++;
     }
-    leftDrive.write(GO); 
-    rightDrive.write(GO);
-    delay(150);
+
   }
-  leftDrive.write(GO); 
-  rightDrive.write(GO);
+  
   if (deg < 9 && t>45)
   {
-    leftDrive.write(STOP); 
-    rightDrive.write(STOP);
+    //leftDrive.write(STOP); 
+    //rightDrive.write(STOP);
     delay(150);
     int currTime = millis();
     while(millis() < (currTime + 250))
@@ -125,63 +148,77 @@ int angle_check()
       deg = deg*180/PI;
       deg = deg - 83;
       deg = deg*1.75;
-      lcd.setCursor(0,0);
-      lcd.print("Inst. Angle: ");
-      lcd.print(deg);
     }
-    leftDrive.write(GO); 
-    rightDrive.write(GO);
-    delay(150);
+    //leftDrive.write(GO); 
+    //rightDrive.write(GO);
+//    delay(150);
   }
-  leftDrive.write(GO); 
-  rightDrive.write(GO);
+  //leftDrive.write(GO); 
+  //rightDrive.write(GO);
 }
 
 void loop()
 {  
-  //check IR sensors
-  leftIR = analogRead(A1);  
-  rightIR = analogRead(A0); 
-  //left turn
-  while(leftIR > WHITE_THRESH)
-  {
-    //    Serial.println("Go Left");
-    steerServo.write(LEFT);
-    delay(TURN_DELAY);
-    leftDrive.write(GO); 
-    rightDrive.write(GO);
-    delay(GO_DELAY);
-    leftIR = analogRead(A1);  
-    rightIR = analogRead(A0);
+  leftDrive.write(GO);
+  rightDrive.write(GO);
+  
+//  //check IR sensors
+//  leftIR = analogRead(A1);  
+//  rightIR = analogRead(A0); 
+//  //left turn
+//  while(leftIR > WHITE_THRESH)
+//  {
+//    //    Serial.println("Go Left");
+//    steerServo.write(LEFT);
+//    delay(TURN_DELAY);
+//    //leftDrive.write(GO); 
+//    //rightDrive.write(GO);
+//    // // delay(GO_DELAY);
+//    leftIR = analogRead(A1);  
+//    rightIR = analogRead(A0);
+//  }
+//  //right turn
+//  while(rightIR > WHITE_THRESH)
+//  {
+//    //    Serial.println("Go Right");
+//    steerServo.write(RIGHT);
+//    delay(TURN_DELAY); 
+//    //// // delay(GO_DELAY);(GO); 
+//    //rightDrive.write(GO);
+//    // // delay(GO_DELAY);
+//    leftIR = analogRead(A1);  
+//    rightIR = analogRead(A0);
+//  }
+//  //straight
+//  while(leftIR <= WHITE_THRESH && rightIR <= WHITE_THRESH)
+//  {
+//    //leftDrive.write(GO); 
+//    //rightDrive.write(GO);
+//    //    Serial.println("Go Straight");
+//    steerServo.write(STRAIGHT);
+//    angle_check();
+//    leftIR = analogRead(A1);  
+//    rightIR = analogRead(A0);
+//  }
+
+  temp = angle_check2();
+  if(temp > 0){angleAdder+=temp;}
+  
+  if(counter == 100){
+    temp2 = angleAdder/counter;
+    lcd.setCursor(0,0);
+    lcd.print("Inst. Angle: ");
+    lcd.print(temp2);
+    if (temp2 > 9){
+    sum = sum + temp2;
+    sumcount++;
+    avg = sum/sumcount;
+    lcd.setCursor(0,1);
+    lcd.print("Avg. Angle: ");
+    lcd.print(avg);
+    }
+    counter = 0;
+    angleAdder = 0;
   }
-  //right turn
-  while(rightIR > WHITE_THRESH)
-  {
-    //    Serial.println("Go Right");
-    steerServo.write(RIGHT);
-    delay(TURN_DELAY);
-    leftDrive.write(GO); 
-    rightDrive.write(GO);
-    delay(GO_DELAY);
-    leftIR = analogRead(A1);  
-    rightIR = analogRead(A0);
-  }
-  //straight
-  while(leftIR <= WHITE_THRESH && rightIR <= WHITE_THRESH)
-  {
-    leftDrive.write(GO); 
-    rightDrive.write(GO);
-    //    Serial.println("Go Straight");
-    steerServo.write(STRAIGHT);
-    leftIR = analogRead(A1);  
-    rightIR = analogRead(A0);
-  }
+  counter++;
 }
-
-
-
-
-
-
-
-
